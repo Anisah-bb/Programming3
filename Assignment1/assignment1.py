@@ -4,9 +4,6 @@ import argparse as ap
 import time
 from pathlib import Path
 
-
-
-
 def get_references(pmid):
     '''function to get referenced documents 
     input: pmid
@@ -19,8 +16,7 @@ def get_references(pmid):
                                     api_key='8fa896ca3cd1a5e694493b053a03429e4d08'))
     references = [f'{link["Id"]}' for link in results[0]["LinkSetDb"][0]["Link"]]
     return references
-   
-    
+
 def download_article(pmid):
     '''function to download an article
     input: pmid
@@ -56,7 +52,8 @@ if __name__ == '__main__':
     #print(references)
     
     #download articles using multiprocessing
-    with mp.Pool(4) as pool:
+    cpu = int(mp.cpu_count() / 2)
+    with mp.Pool(cpu) as pool:
         results = pool.map(download_article, references[0:10])
     
     #print ("End : %s" % time.ctime() )
