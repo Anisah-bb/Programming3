@@ -41,9 +41,12 @@ def get_authors(pmid):
                                         id=pmid,
                                         api_key='8fa896ca3cd1a5e694493b053a03429e4d08'))
     author_list = []
-    author_list = [author for author  in results[0]["AuthorList"]]
-    #print(f"Author list: {author_list}")
-    author_tup = tuple(author_list)
+    try:
+        author_list = [author for author  in results[0]["AuthorList"]]
+        #print(f"Author list: {author_list}")
+        author_tup = tuple(author_list)
+    except RuntimeError:
+        author_tup == (None)
     return author_tup
 
 def write_pickle(pmid):
@@ -58,12 +61,21 @@ def write_pickle(pmid):
         pickle.dump(author_tup, file)
 
 
+
 if __name__ == '__main__':
     #pmid = 30049270 # 8767730
-    pmid = sys.argv[-1]
+    argparser = ap.ArgumentParser(description="Script that downloads (default) 10 articles referenced by the given PubMed ID concurrently.")
+    argparser.add_argument("-n", action="store",
+                           dest="n", required=False, type=int,
+                           help="Number of references to download concurrently.")
+    argparser.add_argument("pubmed_id", action="store", type=str, nargs=1, help="Pubmed ID of the article to harvest for references to download.")
+    args = argparser.parse_args()
+    print("Getting: ", args.pubmed_id)
+    pmid =  str(args.pubmed_id)
+    #make_directory()
     references = get_references(pmid)
-    for id in references:
-        write_pickle(id)
+    write_pickle(pmid for pmid in references)
+    
     
    
     

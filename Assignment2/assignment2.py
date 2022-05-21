@@ -5,9 +5,6 @@ import pmidprocessor as pp
 import argparse as ap
 
 
-# pmid = sys.argv[-1]
-# pp.write_pickle(pmid)
-
 def make_server_manager(port, authkey):
     """ Create a manager for the server, listening on the given port.
         Return a manager object with get_job_q and get_result_q methods.
@@ -147,13 +144,14 @@ if __name__ == '__main__':
     args = argparser.parse_args()
     pmid = args.STARTING_PUBMED_ID
     port = args.port
-    host = args.host[0]
+    host = args.host
     n = args.n
+    a = args.a
 
 
     #print("Getting: ", args."STARTING_PUBMED_ID")
     references = pp.get_references(pmid)
-    authors = pp.write_pickle(references[:args.a])
+    #authors = pp.write_pickle()
 
     POISONPILL = "MEMENTOMORI"
     ERROR = "DOH"
@@ -164,7 +162,7 @@ if __name__ == '__main__':
     #data = references
 
     if args.s:
-        server = mp.Process(target=runserver, args=(authors, references))
+        server = mp.Process(target=runserver, args=(pp.write_pickle, references[:a]))
         server.start()
         time.sleep(1)
         server.join()
