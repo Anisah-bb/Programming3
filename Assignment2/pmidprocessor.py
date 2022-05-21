@@ -53,17 +53,18 @@ def write_pickle(pmid):
     output: file(s) containing authors as a tuple
     '''
     output_path = make_directory()
-    references = get_references(pmid)
-    for pmid in references:
-        author_tup = get_authors(pmid)
-        with open(f'{output_path}/{pmid}.authors.pickle', 'wb') as file:
-            pickle.dump(author_tup, file)
+    author_tup = get_authors(pmid)
+    with open(f'{output_path}/{pmid}.authors.pickle', 'wb') as file:
+        pickle.dump(author_tup, file)
 
 
 if __name__ == '__main__':
     #pmid = 30049270 # 8767730
     pmid = sys.argv[-1]
-    write_pickle(pmid)
+    references = get_references(pmid)
+    for id in references:
+        write_pickle(id)
+    
    
     
 

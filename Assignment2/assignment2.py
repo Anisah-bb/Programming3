@@ -2,10 +2,11 @@ import multiprocessing as mp
 from multiprocessing.managers import BaseManager, SyncManager
 import os, sys, time, queue
 import pmidprocessor as pp
+import argparse as ap
 
 
-pmid = sys.argv[-1]
-pp.write_pickle(pmid)
+# pmid = sys.argv[-1]
+# pp.write_pickle(pmid)
 
 def make_server_manager(port, authkey):
     """ Create a manager for the server, listening on the given port.
@@ -86,9 +87,10 @@ def make_client_manager(ip, port, authkey):
     print('Client connected to %s:%s' % (ip, port))
     return manager
 
-def capitalize(word):
-    """Capitalizes the word you pass in and returns it"""
-    return word.upper()
+# def authors(id):
+#     """gets the authors files"""
+#     return pp.write_pickle(id)
+
 def runclient(num_processes):
     manager = make_client_manager(IP, PORTNUM, AUTHKEY)
     job_q = manager.get_job_q()
@@ -127,18 +129,47 @@ def peon(job_q, result_q):
             print("sleepytime for", my_name)
             time.sleep(1)
 
-POISONPILL = "MEMENTOMORI"
-ERROR = "DOH"
-IP = ''
-PORTNUM = 5381
-AUTHKEY = b'whathasitgotinitspocketsesss?'
-data = ["Always", "look", "on", "the", "bright", "side", "of", "life!"]
+if __name__ == '__main__':
+    #assignment2.py -n <number_of_peons_per_client> [-c | -s] --port <portnumber> --host <serverhost> -a <number_of_articles_to_download> STARTING_PUBMED_ID
+    argparser = ap.ArgumentParser(description="Script that saves the authors of refernced articles by the given PubMed ID article")
+    argparser.add_argument("STARTING_PUBMED_ID", action="store", nargs=1,  type = str, default=10,
+                           help="Pubmed id to get references")
+    argparser.add_argument("-n", action="store", type=int, dest = "n", help="Number of peons for each client")
+    argparser.add_argument("-a", action="store", type=int, dest = "a", help="Number of articles from which to get the authorlist")
+    argparser.add_argument("--port", action="store", type=int,dest = "port", help="the port")
+    argparser.add_argument("--host", action="store", type=str,dest = "host", help="the host")
+
+    group = argparser.add_mutually_exclusive_group()
+    group.add_argument('-c', action='store_true',  dest="c")
+    group.add_argument('-s', action='store_true',  dest="s")
+    
+
+    args = argparser.parse_args()
+    pmid = args.STARTING_PUBMED_ID
+    port = args.port
+    host = args.host[0]
+    n = args.n
 
 
-server = mp.Process(target=runserver, args=(capitalize, data))
-server.start()
-time.sleep(1)
-client = mp.Process(target=runclient, args=(4,))
-client.start()
-server.join()
-client.join()
+    #print("Getting: ", args."STARTING_PUBMED_ID")
+    references = pp.get_references(pmid)
+    authors = pp.write_pickle(references[:args.a])
+
+    POISONPILL = "MEMENTOMORI"
+    ERROR = "DOH"
+    IP = host
+    PORTNUM = port
+    AUTHKEY = b'whathasitgotinitspocketsesss?'
+    
+    #data = references
+
+    if args.s:
+        server = mp.Process(target=runserver, args=(authors, references))
+        server.start()
+        time.sleep(1)
+        server.join()
+
+    if args.c:
+        client = mp.Process(target=runclient, args=(n, ))
+        client.start()
+        client.join()
