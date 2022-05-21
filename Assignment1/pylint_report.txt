@@ -1,0 +1,27 @@
+ ************* Module assignment1
+ assignment1.py:8: convention (C0303, trailing-whitespace, ) Trailing whitespace
+ assignment1.py:11: convention (C0303, trailing-whitespace, ) Trailing whitespace
+ assignment1.py:24: convention (C0303, trailing-whitespace, ) Trailing whitespace
+ assignment1.py:35: convention (C0303, trailing-whitespace, ) Trailing whitespace
+ assignment1.py:36: convention (C0301, line-too-long, ) Line too long (140/100)
+ assignment1.py:40: convention (C0301, line-too-long, ) Line too long (146/100)
+ assignment1.py:43: convention (C0303, trailing-whitespace, ) Trailing whitespace
+ assignment1.py:45: convention (C0303, trailing-whitespace, ) Trailing whitespace
+ assignment1.py:49: convention (C0303, trailing-whitespace, ) Trailing whitespace
+ assignment1.py:53: convention (C0303, trailing-whitespace, ) Trailing whitespace
+ assignment1.py:58: convention (C0303, trailing-whitespace, ) Trailing whitespace
+ assignment1.py:62: convention (C0305, trailing-newlines, ) Trailing newlines
+ assignment1.py:1: convention (C0114, missing-module-docstring, ) Missing module docstring
+ assignment1.py:7: warning (W0621, redefined-outer-name, get_references) Redefining name 'pmid' from outer scope (line 47)
+ assignment1.py:12: warning (W0621, redefined-outer-name, get_references) Redefining name 'results' from outer scope (line 57)
+ assignment1.py:17: warning (W0621, redefined-outer-name, get_references) Redefining name 'references' from outer scope (line 51)
+ assignment1.py:20: warning (W0621, redefined-outer-name, download_article) Redefining name 'pmid' from outer scope (line 47)
+ assignment1.py:4: warning (W0611, unused-import, ) Unused import time
+ assignment1.py:3: convention (C0411, wrong-import-order, ) standard import "import argparse as ap" should be placed before "from Bio import Entrez"
+ assignment1.py:4: convention (C0411, wrong-import-order, ) standard import "import time" should be placed before "from Bio import Entrez"
+ assignment1.py:5: convention (C0411, wrong-import-order, ) standard import "from pathlib import Path" should be placed before "from Bio import Entrez"
+ 
+ ------------------------------------------------------------------
+ Your code has been rated at 2.50/10 (previous run: 6.00/10, -3.50)
+ 
+ 
