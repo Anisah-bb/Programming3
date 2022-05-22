@@ -1,6 +1,6 @@
 import multiprocessing as mp
 from multiprocessing.managers import BaseManager, SyncManager
-import os, sys, time, queue
+import time, queue
 import pmidprocessor as pp
 import argparse as ap
 
@@ -127,7 +127,7 @@ def peon(job_q, result_q):
             time.sleep(1)
 
 if __name__ == '__main__':
-    #assignment2.py -n <number_of_peons_per_client> [-c | -s] --port <portnumber> --host <serverhost> -a <number_of_articles_to_download> STARTING_PUBMED_ID
+    #set up argparser to catch input from command line 
     argparser = ap.ArgumentParser(description="Script that saves the authors of refernced articles by the given PubMed ID article")
     argparser.add_argument("STARTING_PUBMED_ID", action="store", nargs=1,  type = str, default=10,
                            help="Pubmed id to get references")
@@ -135,13 +135,13 @@ if __name__ == '__main__':
     argparser.add_argument("-a", action="store", type=int, dest = "a", help="Number of articles from which to get the authorlist")
     argparser.add_argument("--port", action="store", type=int,dest = "port", help="the port")
     argparser.add_argument("--host", action="store", type=str,dest = "host", help="the host")
-
     group = argparser.add_mutually_exclusive_group()
     group.add_argument('-c', action='store_true',  dest="c")
     group.add_argument('-s', action='store_true',  dest="s")
     
 
     args = argparser.parse_args()
+    print("Getting: ", args.STARTING_PUBMED_ID)
     pmid = args.STARTING_PUBMED_ID
     port = args.port
     host = args.host
@@ -149,18 +149,15 @@ if __name__ == '__main__':
     a = args.a
 
 
-    #print("Getting: ", args."STARTING_PUBMED_ID")
-    references = pp.get_references(pmid)
-    #authors = pp.write_pickle()
-
     POISONPILL = "MEMENTOMORI"
     ERROR = "DOH"
     IP = host
     PORTNUM = port
     AUTHKEY = b'whathasitgotinitspocketsesss?'
-    
-    #data = references
 
+    #get references
+    references = pp.get_references(pmid)
+    #call the function to get the authors from references and index with a(number of authors to extract)
     if args.s:
         server = mp.Process(target=runserver, args=(pp.write_pickle, references[:a]))
         server.start()
@@ -171,3 +168,6 @@ if __name__ == '__main__':
         client = mp.Process(target=runclient, args=(n, ))
         client.start()
         client.join()
+
+    
+   

@@ -74,7 +74,9 @@ if __name__ == '__main__':
     pmid =  str(args.pubmed_id)
     #make_directory()
     references = get_references(pmid)
-    write_pickle(pmid for pmid in references)
+    for id in references:
+        write_pickle(id)
+
     
     
    
