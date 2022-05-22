@@ -1,12 +1,9 @@
-import multiprocessing as mp
-from Bio import Entrez
 import argparse as ap
-import sys
-import time
 from pathlib import Path
 import pickle
+from Bio import Entrez
 
-#pmid = 30049270
+
 def make_directory():
     '''function to create out put directory
     output: a output folder
@@ -20,11 +17,11 @@ def make_directory():
     return output_path
 
 def get_references(pmid):
-    '''function to get referenced documents 
+    '''function to get referenced documents
     input: pmid
     output: list of referenced documents ids
     '''
-    Entrez.email = 'badmusanisat@gmail.com'  
+    Entrez.email = 'badmusanisat@gmail.com'
     results = Entrez.read(Entrez.elink(dbfrom="pubmed",
                                     db="pmc",
                                     LinkName="pubmed_pmc_refs",
@@ -36,9 +33,8 @@ def get_references(pmid):
 def get_authors(pmid):
     '''funtion to get authors of the referenced articles
     '''
-    Entrez.email = 'badmusanisat@gmail.com' 
-    results = Entrez.read(Entrez.esummary(db="pubmed",
-                                        id=pmid,
+    Entrez.email = 'badmusanisat@gmail.com'
+    results = Entrez.read(Entrez.esummary(db="pubmed",id=pmid,
                                         api_key='8fa896ca3cd1a5e694493b053a03429e4d08'))
     author_list = []
     try:
@@ -46,11 +42,11 @@ def get_authors(pmid):
         #print(f"Author list: {author_list}")
         author_tup = tuple(author_list)
     except RuntimeError:
-        author_tup == (None)
+        author_tup = (None)
     return author_tup
 
 def write_pickle(pmid):
-    '''function to write out the authors list as a tuple into a pickle 
+    '''function to write out the authors list as a tuple into a pickle
     file
     input: pmid
     output: file(s) containing authors as a tuple
@@ -60,28 +56,17 @@ def write_pickle(pmid):
     with open(f'{output_path}/{pmid}.authors.pickle', 'wb') as file:
         pickle.dump(author_tup, file)
 
-
-
 if __name__ == '__main__':
     #pmid = 30049270 # 8767730
-    argparser = ap.ArgumentParser(description="Script that downloads (default) 10 articles referenced by the given PubMed ID concurrently.")
-    argparser.add_argument("-n", action="store",
-                           dest="n", required=False, type=int,
+    argparser = ap.ArgumentParser(
+                                description="Script that downloads (default) 10 articles referenced by the given PubMed ID concurrently.")
+    argparser.add_argument("-n", action="store",dest="n", required=False, type=int,
                            help="Number of references to download concurrently.")
-    argparser.add_argument("pubmed_id", action="store", type=str, nargs=1, help="Pubmed ID of the article to harvest for references to download.")
+    argparser.add_argument("pubmed_id", action="store", type=str, nargs=1,
+                             help="Pubmed ID of the article to harvest for references to download.")
     args = argparser.parse_args()
     print("Getting: ", args.pubmed_id)
     pmid =  str(args.pubmed_id)
-    #make_directory()
     references = get_references(pmid)
-    for id in references:
-        write_pickle(id)
-
-    
-    
-   
-    
-
-    
-
-
+    for pmid in references:
+        write_pickle(pmid)

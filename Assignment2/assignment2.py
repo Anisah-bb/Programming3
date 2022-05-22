@@ -1,9 +1,9 @@
-import multiprocessing as mp
-from multiprocessing.managers import BaseManager, SyncManager
-import time, queue
-import pmidprocessor as pp
 import argparse as ap
-
+import multiprocessing as mp
+from multiprocessing.managers import BaseManager
+import time
+import queue
+import pmidprocessor as pp
 
 def make_server_manager(port, authkey):
     """ Create a manager for the server, listening on the given port.
@@ -26,23 +26,19 @@ def make_server_manager(port, authkey):
     print('Server started at port %s' % port)
     return manager
 
-
 def runserver(fn, data):
     # Start a shared manager server and access its queues
     manager = make_server_manager(PORTNUM, b'whathasitgotinitspocketsesss?')
     shared_job_q = manager.get_job_q()
     shared_result_q = manager.get_result_q()
-    
     if not data:
         print("Gimme something to do here!")
         return
-    
     print("Sending data!")
     for d in data:
         shared_job_q.put({'fn' : fn, 'arg' : d})
-    
-    time.sleep(2)  
-    
+
+    time.sleep(2)
     results = []
     while True:
         try:
@@ -65,7 +61,6 @@ def runserver(fn, data):
     manager.shutdown()
     print(results)
 
-
 def make_client_manager(ip, port, authkey):
     """ Create a manager for a client. This manager connects to a server on the
         given address and exposes the get_job_q and get_result_q methods for
@@ -84,16 +79,12 @@ def make_client_manager(ip, port, authkey):
     print('Client connected to %s:%s' % (ip, port))
     return manager
 
-# def authors(id):
-#     """gets the authors files"""
-#     return pp.write_pickle(id)
-
 def runclient(num_processes):
     manager = make_client_manager(IP, PORTNUM, AUTHKEY)
     job_q = manager.get_job_q()
     result_q = manager.get_result_q()
     run_workers(job_q, result_q, num_processes)
-    
+
 def run_workers(job_q, result_q, num_processes):
     processes = []
     for p in range(num_processes):
@@ -121,25 +112,25 @@ def peon(job_q, result_q):
                 except NameError:
                     print("Can't find yer fun Bob!")
                     result_q.put({'job': job, 'result' : ERROR})
-
         except queue.Empty:
             print("sleepytime for", my_name)
             time.sleep(1)
 
 if __name__ == '__main__':
-    #set up argparser to catch input from command line 
-    argparser = ap.ArgumentParser(description="Script that saves the authors of refernced articles by the given PubMed ID article")
+    #set up argparser to catch input from command line
+    argparser = ap.ArgumentParser(
+                                description="Script that saves the authors of refernced articles by the given PubMed ID article")
     argparser.add_argument("STARTING_PUBMED_ID", action="store", nargs=1,  type = str, default=10,
-                           help="Pubmed id to get references")
-    argparser.add_argument("-n", action="store", type=int, dest = "n", help="Number of peons for each client")
-    argparser.add_argument("-a", action="store", type=int, dest = "a", help="Number of articles from which to get the authorlist")
+                            help="Pubmed id to get references")
+    argparser.add_argument("-n", action="store", type=int, dest = "n",
+                            help="Number of peons for each client")
+    argparser.add_argument("-a", action="store", type=int, dest = "a",
+                             help="Number of articles from which to get the authorlist")
     argparser.add_argument("--port", action="store", type=int,dest = "port", help="the port")
     argparser.add_argument("--host", action="store", type=str,dest = "host", help="the host")
     group = argparser.add_mutually_exclusive_group()
     group.add_argument('-c', action='store_true',  dest="c")
     group.add_argument('-s', action='store_true',  dest="s")
-    
-
     args = argparser.parse_args()
     print("Getting: ", args.STARTING_PUBMED_ID)
     pmid = args.STARTING_PUBMED_ID
@@ -147,7 +138,6 @@ if __name__ == '__main__':
     host = args.host
     n = args.n
     a = args.a
-
 
     POISONPILL = "MEMENTOMORI"
     ERROR = "DOH"
@@ -157,7 +147,8 @@ if __name__ == '__main__':
 
     #get references
     references = pp.get_references(pmid)
-    #call the function to get the authors from references and index with a(number of authors to extract)
+    #call the function to get the authors from
+    #references and index with a(number of authors to extract)
     if args.s:
         server = mp.Process(target=runserver, args=(pp.write_pickle, references[:a]))
         server.start()
@@ -168,6 +159,3 @@ if __name__ == '__main__':
         client = mp.Process(target=runclient, args=(n, ))
         client.start()
         client.join()
-
-    
-   
