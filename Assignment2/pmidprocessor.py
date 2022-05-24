@@ -45,11 +45,11 @@ def download_article(pmid):
 def get_authors(pmid):
     '''funtion to get authors of the referenced articles
     '''
-    Entrez.email = 'badmusanisat@gmail.com'
-    results = Entrez.read(Entrez.esummary(db="pubmed",id=pmid,
-                                        api_key='8fa896ca3cd1a5e694493b053a03429e4d08'))
-    author_list = []
     try:
+        Entrez.email = 'badmusanisat@gmail.com'
+        results = Entrez.read(Entrez.esummary(db="pubmed",id=pmid,
+                                            api_key='8fa896ca3cd1a5e694493b053a03429e4d08'))
+        author_list = []
         author_list = [author for author  in results[0]["AuthorList"]]
         #print(f"Author list: {author_list}")
         author_tup = tuple(author_list)
