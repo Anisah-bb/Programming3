@@ -151,6 +151,7 @@ if __name__ == '__main__':
     #references and index with a(number of authors to extract)
     if args.s:
         server = mp.Process(target=runserver, args=(pp.write_pickle, references[:a]))
+        server = mp.Process(target=runserver, args=(pp.download_article, references[:a]))
         server.start()
         time.sleep(1)
         server.join()
