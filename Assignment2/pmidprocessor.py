@@ -29,7 +29,7 @@ def get_references(pmid):
                                     api_key='8fa896ca3cd1a5e694493b053a03429e4d08'))
     references = [f'{link["Id"]}' for link in results[0]["LinkSetDb"][0]["Link"]]
     return references
-    
+
 def download_article(pmid):
     '''function to download an article
     input: pmid
@@ -65,6 +65,7 @@ def write_pickle(pmid):
     '''
     output_path = make_directory()
     author_tup = get_authors(pmid)
+    download_article(pmid)
     with open(f'{output_path}/{pmid}.authors.pickle', 'wb') as file:
         pickle.dump(author_tup, file)
 
