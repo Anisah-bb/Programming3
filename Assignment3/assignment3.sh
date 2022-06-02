@@ -19,6 +19,8 @@ export time=/usr/bin/time
 export BLASTDB=/local-fs/datasets/refseq_protein/refseq_protein
 export blastoutput=output/blastoutput.txt
 
+echo -n "" > $time_file
+
 for i in {1..16} ; do $time -a -o $time_file -f %e blastp -query MCRA.faa -db $BLASTDB -num_threads $i -outfmt 6 >> $blastoutput; done
 
-#python3 assignment3.py
+python3 assignment3.py
