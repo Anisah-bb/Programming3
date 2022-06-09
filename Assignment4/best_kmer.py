@@ -22,6 +22,9 @@ best_kmer = kmers[best_index]
 
 
 original = '/students/2021-2022/master/Firdaws_DSLS/output/Firdaws_{}/contigs.fa'.format(best_kmer)
-target = '/homes/fabadmus/programming3/Programming3/Assignment4/'
+target = '/homes/fabadmus/programming_3/Programming3/Assignment4/output/contigs.fa'
+csv = '/students/2021-2022/master/Firdaws_DSLS/output/kmers.csv'
+target2 = '/homes/fabadmus/programming_3/Programming3/Assignment4/output/kmers.csv'
 
 shutil.move(original, target)
+shutil.move(csv, target2)

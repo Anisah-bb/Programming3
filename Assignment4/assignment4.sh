@@ -15,7 +15,7 @@ output_folder=${output}Firdaws_
 
 seq 29 2 31 | parallel -j16 "velveth ${output_folder}{} {} -longPaired -fastq -separate ${paired_NGS_1} ${paired_NGS_2} &&  velvetg ${output_folder}{} && cat ${output_folder}{}/contigs.fa | python3 assignment4.py -kmers {} >> /students/2021-2022/master/Firdaws_DSLS/output/kmers.csv"
 
-output_final=/homes/fabadmus/programming3/Programming3/Assignment4/output
+output_final=/homes/fabadmus/programming_3/Programming3/Assignment4/output
 
 mkdir -p ${output_final}
 
