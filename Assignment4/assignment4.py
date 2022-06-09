@@ -32,8 +32,8 @@ sequence = sequence[1:]
 
 #get lengths of contigs
 contigs_len = []
-for record in records:
-    seq = len(record.seq._data.upper())
+for record in sequence:
+    seq = len(record)
     contigs_len.append(seq)
 
 #sort the contigs lens
