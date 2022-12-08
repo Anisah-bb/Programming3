@@ -1,131 +1,53 @@
-from sklearn.metrics import classification_report
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import GridSearchCV
-import pandas as pd
-import numpy as np
-import dask
-import dask.delayed
-import time
+''' This ia class that performs machine learning on the model_data file.
+To run this, please use the main script assignment6.py
+'''
 import pickle
-from dask_ml.compose import ColumnTransformer
-from dask_ml.impute import SimpleImputer
-from dask_ml.preprocessing import StandardScaler, DummyEncoder
-from distributed import wait
-from dask_ml.metrics import accuracy_score
-from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
-from dask_ml.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-import dask.array as da
-import joblib
-from dask.distributed import Client, progress
 import warnings
+import joblib
+from dask_ml.metrics import accuracy_score
+from sklearn.ensemble import RandomForestClassifier
+from dask_ml.model_selection import train_test_split
+
 warnings.filterwarnings('ignore')
 
-
-
-class train():
+class Train():
     '''
-    train model and predict
+    class to train model and make predictions
     '''
-    def __init__(self):
-        pass
-    
-    def train_prep(self, data):
+    def __init__(self, clean_data, report_path, model_path):
+        self.data = clean_data
+        self.report_path = report_path
+        self.model_path = model_path
+        self.train_features, self.test_features, self.train_labels, self.test_labels = self.train_prep()
+    def train_prep(self):
         '''
         funtion to prepare the data for training
         '''
         # select features
-        features = data.iloc[:,1:-1].values
-        # Saving feature names for later use
-        #feature_list = list(features.columns)
-        # Convert to numpy array
-        # features = da.array(features)
-        
-        # select labels
-        labels = data.iloc[:, -1].values
-        
-
+        features = self.data.iloc[:,1:-1].values
+        labels = self.data.iloc[:, -1].values
         #split data
-        train_features, test_features, train_labels, test_labels = train_test_split(features,
-                                                                labels, test_size = 0.3, random_state=1)
+        train_features, test_features, train_labels, test_labels = train_test_split(
+            features,labels, test_size = 0.3, random_state=1)
         return train_features, test_features, train_labels, test_labels
-    
-    @staticmethod
-    def train_model(train_features, test_features, train_labels, test_labels):
+
+    def train_model(self):
         '''
         function to perform random forest classification
         '''
-        
-      
-        with joblib.parallel_backend("dask", scatter=[train_features, train_labels]):
-            model = RandomForestClassifier(n_estimators=1000, random_state = 42)
+        with joblib.parallel_backend("dask",
+                                     scatter=[self.train_features, self.train_labels]):
+            model = RandomForestClassifier( random_state = 42)
             print('Now training')
-            model.fit(train_features, train_labels)
+            model.fit(self.train_features, self.train_labels)
             #predict and evaluate
-            pred_labels = model.predict(test_features)
-            print("Accuracy for Random Forest: ",accuracy_score(test_labels, pred_labels))
-            # report = classification_report(test_labels, pred_labels, output_dict=True)
-            
-            # report_df = pd.DataFrame(report).transpose()
-            # pd.DataFrame.to_csv(report_df, '/homes/fabadmus/programming_3/Programming3/Assignment6/model_report2')
-            # save the model 
-            filename = 'rf_model.sav'
-            pickle.dump(model, open(filename, 'wb'))
-       
-    # @staticmethod    
-    # def model_train(train_features, test_features, train_labels, test_labels):
-        
-    #     with joblib.parallel_backend('dask'):
-            
-    #         # model.fit(train_features, train_labels)
-    #         param_grid = { 
-    #                 'n_estimators': [200, 500],
-    #                 'max_features': ['auto', 'sqrt', 'log2'],
-    #                 'max_depth' : [4,5,6,7,8],
-    #                 'criterion' :['gini', 'entropy']
-    #             }
-    #         model = RandomForestClassifier(n_estimators=1000, random_state = 42)
-    #         CV_rfc = GridSearchCV(estimator=model, param_grid=param_grid, cv= 5)
-    #         print('Now training')
-            
-    #         CV_rfc.fit(train_features, train_labels)
-    #         print('Done training')
-    
-        
-
-
-        
-       
-    #     pred_labels = CV_rfc.predict(test_features)
-        
-    #     print("Accuracy for Random Forest on CV data: ",accuracy_score(test_labels, pred_labels))
-        
-    #     report = classification_report(test_labels, pred_labels, output_dict=True)
-        
-    #     report_df = pd.DataFrame(report).transpose()
-    #     pd.DataFrame.to_csv(report_df, '/homes/fabadmus/programming_3/Programming3/Assignment6/model_report')
-        
-    #     # save the model 
-    #     filename = 'rf_model.sav'
-    #     pickle.dump(CV_rfc, open(filename, 'wb'))
-
-
-
-
-        
-def main():
-
-    data = pd.read_csv('/homes/fabadmus/programming_3/Programming3/Assignment6/model_data', )
-    model = train()
-    train_features, test_features, train_labels, test_labels = model.train_prep(data)
-    # print(train_labels)
-    client = Client(processes=False, threads_per_worker=4,
-                n_workers=1, memory_limit='128GB')
-    client
-        
-    model.train_model(train_features, test_features, train_labels, test_labels )
-    
-    
-
-if __name__ == '__main__':
-    main()
+            pred_labels = model.predict(self.test_features)
+            with open(self.report_path, 'a', encoding="utf-8") as out_file:
+                out_file.write("Accuracy for Random Forest: ",
+                               accuracy_score(self.test_labels, pred_labels))
+                print("Accuracy for Random Forest: ",
+                      accuracy_score(self.test_labels, pred_labels))
+            # save model
+            filepath = self.model_path
+            with open(filepath, 'wb', encoding="utf-8"):
+                pickle.dump(model, filepath)
