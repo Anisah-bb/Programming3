@@ -17,7 +17,7 @@ argparser = ap.ArgumentParser(
 argparser.add_argument("--IN_FILE_PATH", "-i", action="store",  type = str,
                             help="TSV file of InterPROscan annotations")
 argparser.add_argument("--OUT_FILE_PATH", "-o", action="store",  type = str,
-                            help="TSV file of InterPROscan annotations")
+                            help="Path to save results")
 args = argparser.parse_args()
 print("Getting data: ", args.IN_FILE_PATH)
 
