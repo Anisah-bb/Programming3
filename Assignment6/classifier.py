@@ -42,7 +42,7 @@ class Train():
             model.fit(self.train_features, self.train_labels)
             #predict and evaluate
             pred_labels = model.predict(self.test_features)
-            report = "Accuracy for Random Forest: ", accuracy_score(self.test_labels, pred_labels)
+            report = f"Accuracy for Random Forest: {self.test_labels, pred_labels}"
             with open(self.report_path, 'a', encoding="utf-8") as out_file:
                 out_file.write(report)
                 print(report)
